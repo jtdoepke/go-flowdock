@@ -3,9 +3,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/wm/go-flowdock/auth"
-	"github.com/wm/go-flowdock/flowdock"
 	"log"
+
+	"github.com/jtdoepke/go-flowdock/auth"
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 func main() {

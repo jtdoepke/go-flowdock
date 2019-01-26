@@ -1,11 +1,12 @@
 package main
 
 import (
-	"code.google.com/p/goauth2/oauth"
 	"fmt"
-	"github.com/wm/go-flowdock/auth"
-	"github.com/wm/go-flowdock/flowdock"
 	"log"
+
+	"code.google.com/p/goauth2/oauth"
+	"github.com/jtdoepke/go-flowdock/auth"
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 func main() {

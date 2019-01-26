@@ -2,16 +2,16 @@
 
 go-flowdock is Go client library for accessing the [Flowdock API][].
 
-[![GoDoc](https://godoc.org/github.com/wm/go-flowdock/flowdock?status.png)](https://godoc.org/github.com/wm/go-flowdock/flowdock)
-[![Build Status](https://travis-ci.org/wm/go-flowdock.png?branch=master)](https://travis-ci.org/wm/go-flowdock)
-[![Coverage Status](https://coveralls.io/repos/wm/go-flowdock/badge.png)](https://coveralls.io/r/wm/go-flowdock)
+[![GoDoc](https://godoc.org/github.com/jtdoepke/go-flowdock/flowdock?status.png)](https://godoc.org/github.com/jtdoepke/go-flowdock/flowdock)
+[![Build Status](https://travis-ci.org/jtdoepke/go-flowdock.png?branch=master)](https://travis-ci.org/jtdoepke/go-flowdock)
+[![Coverage Status](https://coveralls.io/repos/jtdoepke/go-flowdock/badge.png)](https://coveralls.io/r/jtdoepke/go-flowdock)
 
 go-flowdock requires Go version 1.1 or greater.
 
 ## Usage ##
 
 ```go
-import "github.com/wm/go-flowdock/flowdock"
+import "github.com/jtdoepke/go-flowdock/flowdock"
 ```
 
 ### Authentication ###
@@ -62,5 +62,5 @@ file.
 [goauth2]: https://code.google.com/p/goauth2/
 [goauth2 docs]: http://godoc.org/code.google.com/p/goauth2/oauth
 [personal API token]: https://flowdock.com/account/authorized_applications
-[package docs]: http://godoc.org/github.com/wm/go-flowdock/flowdock
+[package docs]: http://godoc.org/github.com/jtdoepke/go-flowdock/flowdock
 [go-github]: https://github.com/google/go-github

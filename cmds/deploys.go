@@ -1,14 +1,15 @@
 package main
 
 import (
-	"code.google.com/p/goauth2/oauth"
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/wm/go-flowdock/flowdock"
 	"log"
 	"net/http"
 	"os"
 	"sort"
+
+	"code.google.com/p/goauth2/oauth"
+	"github.com/codegangsta/cli"
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 const usageMsg = `
