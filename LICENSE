@@ -31,7 +31,3 @@ https://www.flowdock.com/api
 
 The style of this library is based heavily upon go-github
 https://github.com/google/go-github (see LICENSE-GOGITHUB)
-
-The auth package is based off on the example found at
-https://code.google.com/p/goauth2/source/browse/oauth/example/oauthreq.go (see
-LICENSE-GOAUTH2)

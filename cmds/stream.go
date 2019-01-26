@@ -1,17 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
-	"code.google.com/p/goauth2/oauth"
 	"github.com/jtdoepke/go-flowdock/auth"
 	"github.com/jtdoepke/go-flowdock/flowdock"
+	"golang.org/x/oauth2"
 )
 
 func main() {
 	httpClient := auth.AuthenticationRequest()
-	token, _ := oauth.CacheFile("cache.json").Token()
+	token, _ := cachedAuthToken("cache.json")
 
 	client := flowdock.NewClient(httpClient)
 
@@ -68,4 +70,16 @@ func stringInSlice(a string, list []string) bool {
 
 func stringNotInSlice(a string, list []string) bool {
 	return !stringInSlice(a, list)
+}
+
+// cachedAuthToken reads a JSON-serialized oauth2.Token from a file.
+func cachedAuthToken(path string) (*oauth2.Token, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	tok := &oauth2.Token{}
+	err = json.NewDecoder(f).Decode(tok)
+	return tok, err
 }
