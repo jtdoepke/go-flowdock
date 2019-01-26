@@ -134,6 +134,9 @@ func (s *FlowsService) Create(orgName string, opt *FlowsCreateOptions) (*Flow, *
 	u := fmt.Sprintf("flows/%v", orgName)
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("POST", u, nil)
 	if err != nil {
 		return nil, nil, err

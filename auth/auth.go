@@ -69,7 +69,7 @@ func AuthenticationRequest() *http.Client {
 			// Get an authorization code from the data provider.
 			// ("Please ask the user if I can access this resource.")
 			url := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-			fmt.Println("Visit this URL to get a code, then run again with -code=YOUR_CODE\n")
+			fmt.Println("Visit this URL to get a code, then run again with -code=YOUR_CODE")
 			fmt.Println(url)
 			os.Exit(0)
 		}
@@ -88,7 +88,10 @@ func AuthenticationRequest() *http.Client {
 		Tok:    tok,
 		Source: config.TokenSource(ctx, tok),
 	}
-	cache.Write() // Cache the new token.
+	err = cache.Write() // Cache the new token.
+	if err != nil {
+		log.Fatal("Cache token:", err)
+	}
 	fmt.Printf("Token is cached in %v\n", cache.Path)
 
 	client := oauth2.NewClient(ctx, cache)

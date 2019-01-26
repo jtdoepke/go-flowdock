@@ -136,7 +136,10 @@ func TestFlowsService_Update(t *testing.T) {
 
 	mux.HandleFunc("/flows/org/flow", func(w http.ResponseWriter, r *http.Request) {
 		v := new(Flow)
-		json.NewDecoder(r.Body).Decode(v)
+		err := json.NewDecoder(r.Body).Decode(v)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		testMethod(t, r, "PUT")
 		if !reflect.DeepEqual(v, input) {

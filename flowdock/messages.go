@@ -3,9 +3,10 @@ package flowdock
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bernerdschaefer/eventsource"
 	"net/http"
 	"time"
+
+	"github.com/bernerdschaefer/eventsource"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -50,11 +51,14 @@ func (s *MessagesService) Stream(token, org, flow string) (chan Message, *events
 			event, err := es.Read()
 
 			if err != nil {
-				// TODO panic or add error channel!
+				panic(err) // TODO: Replace this with better error handling, such as a channel.
 			}
 
 			m := new(Message)
 			err = json.Unmarshal([]byte(event.Data), m)
+			if err != nil {
+				panic(err) // TODO: Replace this with better error handling, such as a channel.
+			}
 			messageCh <- *m
 		}
 	}()
@@ -109,6 +113,9 @@ func (s *MessagesService) CreateComment(opt *MessagesCreateOptions) (*Message, *
 	u := "comments"
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("POST", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -130,6 +137,9 @@ func (s *MessagesService) Create(opt *MessagesCreateOptions) (*Message, *http.Re
 	u := "messages"
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("POST", u, nil)
 	if err != nil {
 		return nil, nil, err

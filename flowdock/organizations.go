@@ -81,6 +81,9 @@ func (s *OrganizationsService) Update(id int, opt *OrganizationUpdateOptions) (*
 	u := fmt.Sprintf("organizations/%v", id)
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("PUT", u, nil)
 	if err != nil {
 		return nil, nil, err

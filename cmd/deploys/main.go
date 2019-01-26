@@ -47,16 +47,16 @@ func main() {
 	app := cli.NewApp()
 
 	app.Flags = []cli.Flag{
-		cli.StringFlag{"id", "", "Client ID"},
-		cli.StringFlag{"secret", "", "Client Secret"},
-		cli.StringFlag{"redirect_url", "urn:ietf:wg:oauth:2.0:oob", "Redirect URL"},
-		cli.StringFlag{"auth_url", "https://api.flowdock.com/oauth/authorize", "Authentication URL"},
-		cli.StringFlag{"token_url", "https://api.flowdock.com/oauth/token", "Token URL"},
-		cli.StringFlag{"code", "", "Authorization Code"},
-		cli.StringFlag{"cache", "cache.json", "Token cache file"},
-		cli.StringFlag{"environment, e", "production", "the deploy target"},
-		cli.StringFlag{"organization, o", "iora", "the organization of the flow"},
-		cli.StringFlag{"flow, f", "tech-stuff", "the name of the flow to query"},
+		cli.StringFlag{Name: "id", Value: "", Usage: "Client ID"},
+		cli.StringFlag{Name: "secret", Value: "", Usage: "Client Secret"},
+		cli.StringFlag{Name: "redirect_url", Value: "urn:ietf:wg:oauth:2.0:oob", Usage: "Redirect URL"},
+		cli.StringFlag{Name: "auth_url", Value: "https://api.flowdock.com/oauth/authorize", Usage: "Authentication URL"},
+		cli.StringFlag{Name: "token_url", Value: "https://api.flowdock.com/oauth/token", Usage: "Token URL"},
+		cli.StringFlag{Name: "code", Value: "", Usage: "Authorization Code"},
+		cli.StringFlag{Name: "cache", Value: "cache.json", Usage: "Token cache file"},
+		cli.StringFlag{Name: "environment, e", Value: "production", Usage: "the deploy target"},
+		cli.StringFlag{Name: "organization, o", Value: "iora", Usage: "the organization of the flow"},
+		cli.StringFlag{Name: "flow, f", Value: "tech-stuff", Usage: "the name of the flow to query"},
 	}
 
 	app.Name = "deploys"
@@ -68,7 +68,7 @@ func main() {
 		args := c.Args()
 
 		if len(args) == 0 {
-			cli.ShowAppHelp(c)
+			_ = cli.ShowAppHelp(c)
 			os.Exit(1)
 		}
 
@@ -88,7 +88,7 @@ func main() {
 		displayAppDeployCount(channel)
 	}
 
-	app.Run(os.Args)
+	_ = app.Run(os.Args)
 }
 
 func getAppDeployCount(q Query, client *flowdock.Client, channel chan AppDeployCount) {
@@ -163,7 +163,7 @@ func stringInSlice(a string, list []string) bool {
 func sortedKeys(m *map[string]int) *[]string {
 	mk := make([]string, len(*m))
 	i := 0
-	for k, _ := range *m {
+	for k := range *m {
 		mk[i] = k
 		i++
 	}
@@ -190,7 +190,7 @@ func AuthenticationRequest(c *cli.Context) *http.Client {
 		ClientID:     c.String("id"),
 		ClientSecret: c.String("secret"),
 		RedirectURL:  "urn:ietf:wg:oauth:2.0:oob",
-		Scopes:       "",
+		Scopes:       []string{},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  c.String("auth_url"),
 			TokenURL: c.String("token_url"),
@@ -202,7 +202,7 @@ func AuthenticationRequest(c *cli.Context) *http.Client {
 			// Get an authorization code from the data provider.
 			// ("Please ask the user if I can access this resource.")
 			url := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-			fmt.Println("Visit this URL to get a code, then run again with -code=YOUR_CODE\n")
+			fmt.Println("Visit this URL to get a code, then run again with -code=YOUR_CODE")
 			fmt.Println(url)
 			os.Exit(0)
 		}
@@ -221,7 +221,10 @@ func AuthenticationRequest(c *cli.Context) *http.Client {
 		Tok:    tok,
 		Source: config.TokenSource(ctx, tok),
 	}
-	cache.Write() // Cache the new token.
+	err = cache.Write() // Cache the new token.
+	if err != nil {
+		log.Fatal("Cache token:", err)
+	}
 	fmt.Printf("Token is cached in %v\n", cache.Path)
 
 	client := oauth2.NewClient(ctx, cache)

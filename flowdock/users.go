@@ -81,6 +81,9 @@ func (s *UsersService) Update(id int, opt *UserUpdateOptions) (*User, *http.Resp
 	u := fmt.Sprintf("users/%v", id)
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("PUT", u, nil)
 	if err != nil {
 		return nil, nil, err

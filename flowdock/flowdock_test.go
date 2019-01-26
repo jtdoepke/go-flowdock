@@ -55,7 +55,6 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 type responseWriter interface {
 	http.ResponseWriter
 	http.Flusher
-	http.CloseNotifier
 }
 
 type values map[string]string
@@ -66,7 +65,11 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 		want.Add(k, v)
 	}
 
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if !reflect.DeepEqual(want, r.Form) {
 		t.Errorf("Request parameters = %v, want %v", r.Form, want)
 	}
@@ -154,7 +157,10 @@ func TestDo(t *testing.T) {
 
 	req, _ := client.NewRequest("GET", "/", nil)
 	body := new(foo)
-	client.Do(req, body)
+	_, err := client.Do(req, body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	want := &foo{"a"}
 	if !reflect.DeepEqual(body, want) {

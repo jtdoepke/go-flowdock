@@ -12,7 +12,7 @@ type Time struct {
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface. The time is
-// expected to be an intger representing milliseconds since Epoch.
+// expected to be an integer representing milliseconds since Epoch.
 func (t *Time) UnmarshalJSON(b []byte) error {
 	result, err := strconv.ParseInt(string(b), 0, 64)
 

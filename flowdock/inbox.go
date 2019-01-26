@@ -34,6 +34,9 @@ func (s *InboxService) Create(flowApiToken string, opt *InboxCreateOptions) (*Me
 	u := fmt.Sprintf("v1/messages/team_inbox/%v", flowApiToken)
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	req, err := s.client.NewRequest("POST", u, nil)
 	if err != nil {
 		return nil, nil, err
