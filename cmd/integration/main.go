@@ -77,7 +77,7 @@ func flowsList(client *flowdock.Client) {
 
 func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
-	fmt.Println("Flow:", *flow.ID, *flow.Name, *org.Name, *flow.Url)
+	fmt.Println("Flow:", *flow.ID, *flow.Name, *org.Name, *flow.URL)
 }
 
 func messageList(client *flowdock.Client) {

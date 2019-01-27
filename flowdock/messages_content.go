@@ -55,10 +55,10 @@ func (c *CommentContent) String() string {
 // VCS (i.e. Github)
 type VcsContent struct {
 	Issue struct {
-		Url *string `json:"url"`
+		URL *string `json:"url"`
 	} `json:"issue,omitempty"`
 	PullRequest struct {
-		Url *string `json:"url"`
+		URL *string `json:"url"`
 	} `json:"pull_request,omitempty"`
 	Pusher struct {
 		Name *string `json:"name"`
@@ -70,7 +70,7 @@ type VcsContent struct {
 		Name *string `json:"name"`
 	} `json:"repository,omitempty"`
 	Event      *string `json:"event,omitempty"`
-	CompareUrl *string `json:"compare,omitempty"`
+	CompareURL *string `json:"compare,omitempty"`
 }
 
 // Return the string version of a VcsContent
@@ -89,12 +89,12 @@ func (c *VcsContent) String() string {
 		user = "Unknown"
 	}
 
-	if c.CompareUrl != nil {
-		url = *c.CompareUrl
-	} else if c.PullRequest.Url != nil {
-		url = *c.PullRequest.Url
-	} else if c.Issue.Url != nil {
-		url = *c.Issue.Url
+	if c.CompareURL != nil {
+		url = *c.CompareURL
+	} else if c.PullRequest.URL != nil {
+		url = *c.PullRequest.URL
+	} else if c.Issue.URL != nil {
+		url = *c.Issue.URL
 	}
 
 	return fmt.Sprintf("%s: %s by %s %s", name, event, user, url)

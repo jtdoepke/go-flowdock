@@ -106,6 +106,6 @@ type Organization struct {
 	UserLimit         *int64  `json:"user_limit,omitempty"`
 	UserCount         *int64  `json:"user_count,omitempty"`
 	Active            *bool   `json:"active,omitempty"`
-	Url               *string `json:"url,omitempty"`
+	URL               *string `json:"url,omitempty"`
 	Users             *[]User `json:"users"`
 }

@@ -22,9 +22,9 @@ type Flow struct {
 	Open              *bool         `json:"open,omitempty"`
 	Disabled          *bool         `json:"disabled,omitempty"`
 	Joined            *bool         `json:"joined,omitempty"`
-	Url               *string       `json:"url,omitempty"`
-	WebUrl            *string       `json:"web_url,omitempty"`
-	JoinUrl           *string       `json:"join_url,omitempty"`
+	URL               *string       `json:"url,omitempty"`
+	WebURL            *string       `json:"web_url,omitempty"`
+	JoinURL           *string       `json:"join_url,omitempty"`
 	AccessMode        *string       `json:"access_mode,omitempty"`
 	Organization      *Organization `json:"organization,omitempty"`
 	Users             *[]User       `json:"users,omitempty"`
