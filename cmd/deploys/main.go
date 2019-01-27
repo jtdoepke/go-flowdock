@@ -11,9 +11,9 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/codegangsta/cli"
 	"github.com/jtdoepke/go-flowdock/flowdock"
 	"golang.org/x/oauth2"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const usageMsg = `
