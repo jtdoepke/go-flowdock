@@ -5,21 +5,23 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
+
+	"github.com/google/go-querystring/query"
 )
 
 const (
 	libraryVersion   = "0.0"
-	defaultRestURL   = "https://api.flowdock.com/"
-	defaultStreamURL = "https://stream.flowdock.com/"
-	tokenRestURL     = "https://%s@api.flowdock.com/"
-	tokenStreamURL   = "https://%s@stream.flowdock.com/"
-	userAgent        = "go-flowdock/" + libraryVersion
 	defaultMediaType = "application/json"
+
+	RestURL        = "https://api.flowdock.com/"       // The Flowdock REST API URL.
+	StreamURL      = "https://stream.flowdock.com/"    // The Flowdock Stream API endpoint.
+	TokenRestURL   = "https://%s@api.flowdock.com/"    // The Flowdock REST API URL with template for formatting access token.
+	TokenStreamURL = "https://%s@stream.flowdock.com/" // The Flowdock Stream API endpoint with template for formatting access token.
+	UserAgent      = "go-flowdock/" + libraryVersion   // go-flowdock UserAgent
 )
 
 // A Client manages communication with the Flowdock API.
@@ -49,7 +51,7 @@ func newClient(httpClient *http.Client, baseURL, streamURL *url.URL) *Client {
 		client:    httpClient,
 		RestURL:   baseURL,
 		StreamURL: streamURL,
-		UserAgent: userAgent,
+		UserAgent: UserAgent,
 	}
 
 	c.Flows = &FlowsService{client: c}
@@ -68,8 +70,8 @@ func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL, _ := url.Parse(defaultRestURL)
-	streamURL, _ := url.Parse(defaultStreamURL)
+	baseURL, _ := url.Parse(RestURL)
+	streamURL, _ := url.Parse(StreamURL)
 	return newClient(httpClient, baseURL, streamURL)
 }
 
@@ -79,8 +81,8 @@ func NewClientWithToken(httpClient *http.Client, token string) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL, _ := url.Parse(fmt.Sprintf(tokenRestURL, token))
-	streamURL, _ := url.Parse(fmt.Sprintf(tokenStreamURL, token))
+	baseURL, _ := url.Parse(fmt.Sprintf(TokenRestURL, token))
+	streamURL, _ := url.Parse(fmt.Sprintf(TokenStreamURL, token))
 	return newClient(httpClient, baseURL, streamURL)
 }
 

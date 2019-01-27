@@ -1,10 +1,12 @@
-package flowdock
+package flowdock_test
 
 import (
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 var (
@@ -26,7 +28,7 @@ func TestUsersService_All(t *testing.T) {
 		t.Errorf("Users.All returned error: %v", err)
 	}
 
-	want := []User{{Id: &userId1}, {Id: &userId2}}
+	want := []flowdock.User{{Id: &userId1}, {Id: &userId2}}
 	if !reflect.DeepEqual(users, want) {
 		t.Errorf("Users.All returned %+v, want %+v", users, want)
 	}
@@ -46,7 +48,7 @@ func TestUsersService_List(t *testing.T) {
 		t.Errorf("Users.List returned error: %v", err)
 	}
 
-	want := []User{{Id: &userId1}, {Id: &userId2}}
+	want := []flowdock.User{{Id: &userId1}, {Id: &userId2}}
 	if !reflect.DeepEqual(users, want) {
 		t.Errorf("Users.List returned %+v, want %+v", users, want)
 	}
@@ -66,7 +68,7 @@ func TestUsersService_Get(t *testing.T) {
 		t.Errorf("Users.Get returned error: %v", err)
 	}
 
-	want := User{Id: &userId1}
+	want := flowdock.User{Id: &userId1}
 	if !reflect.DeepEqual(user.Id, want.Id) {
 		t.Errorf("Users.Get returned %+v, want %+v", user.Id, want.Id)
 	}
@@ -83,7 +85,7 @@ func TestUsersService_Update(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "nick":"new-nick"}`)
 	})
 
-	opts := &UserUpdateOptions{
+	opts := &flowdock.UserUpdateOptions{
 		Nick: "new-nick",
 	}
 	user, _, err := client.Users.Update(userId1, opts)
@@ -91,7 +93,7 @@ func TestUsersService_Update(t *testing.T) {
 		t.Errorf("Users.Update returned error: %v", err)
 	}
 
-	want := User{Nick: &nick}
+	want := flowdock.User{Nick: &nick}
 	if !reflect.DeepEqual(user.Nick, want.Nick) {
 		t.Errorf("Users.Update returned %+v, want %+v", user.Nick, want.Nick)
 	}

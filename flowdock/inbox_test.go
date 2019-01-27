@@ -1,10 +1,12 @@
-package flowdock
+package flowdock_test
 
 import (
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 func TestInboxService_Create(t *testing.T) {
@@ -19,7 +21,7 @@ func TestInboxService_Create(t *testing.T) {
 		fmt.Fprint(w, `{}`)
 	})
 
-	opt := InboxCreateOptions{
+	opt := flowdock.InboxCreateOptions{
 		Subject: "a subject",
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
@@ -28,7 +30,7 @@ func TestInboxService_Create(t *testing.T) {
 		t.Errorf("Messages.Create returned error: %v", err)
 	}
 
-	want := new(Message)
+	want := new(flowdock.Message)
 	if !reflect.DeepEqual(message, want) {
 		t.Errorf("Messages.Create returned \n%+v \nwant \n%+v", message, want)
 	}

@@ -1,4 +1,4 @@
-package flowdock
+package flowdock_test
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 var (
@@ -16,7 +18,7 @@ var (
 	mux *http.ServeMux
 
 	// client is the Flowdock client being tested.
-	client *Client
+	client *flowdock.Client
 
 	// server is a test HTTP server used to provide mock API responses.
 	server *httptest.Server
@@ -35,7 +37,7 @@ func setup() {
 	streamServer = httptest.NewServer(mux)
 
 	// flowdock client configured to use test server
-	client = NewClient(nil)
+	client = flowdock.NewClient(nil)
 	client.RestURL, _ = url.Parse(server.URL)
 	client.StreamURL, _ = url.Parse(streamServer.URL)
 }
@@ -76,35 +78,35 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient(nil)
+	c := flowdock.NewClient(nil)
 
-	if c.RestURL.String() != defaultRestURL {
-		t.Errorf("NewClient RestURL = %v, want %v", c.RestURL.String(), defaultRestURL)
+	if c.RestURL.String() != flowdock.RestURL {
+		t.Errorf("NewClient RestURL = %v, want %v", c.RestURL.String(), flowdock.RestURL)
 	}
-	if c.UserAgent != userAgent {
-		t.Errorf("NewClient UserAgent = %v, want %v", c.UserAgent, userAgent)
+	if c.UserAgent != flowdock.UserAgent {
+		t.Errorf("NewClient UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
 	}
 }
 
 func TestNewClientWithToken(t *testing.T) {
 	token := "not-real-token"
-	c := NewClientWithToken(nil, token)
+	c := flowdock.NewClientWithToken(nil, token)
 
-	url := fmt.Sprintf(tokenRestURL, token)
+	url := fmt.Sprintf(flowdock.TokenRestURL, token)
 	if c.RestURL.String() != url {
 		t.Errorf("NewClientWithToken RestURL = %v, want %v", c.RestURL.String(), url)
 	}
-	if c.UserAgent != userAgent {
-		t.Errorf("NewClientWithToken UserAgent = %v, want %v", c.UserAgent, userAgent)
+	if c.UserAgent != flowdock.UserAgent {
+		t.Errorf("NewClientWithToken UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
 	}
 }
 
 func TestNewRequest(t *testing.T) {
-	c := NewClient(nil)
+	c := flowdock.NewClient(nil)
 
 	name := "n"
-	inURL, outURL := "/foo", defaultRestURL+"foo"
-	inBody, outBody := &Flow{Name: &name}, `{"name":"n"}`+"\n"
+	inURL, outURL := "/foo", flowdock.RestURL+"foo"
+	inBody, outBody := &flowdock.Flow{Name: &name}, `{"name":"n"}`+"\n"
 	req, _ := c.NewRequest("GET", inURL, inBody)
 
 	// test that relative URL was expanded
@@ -120,13 +122,13 @@ func TestNewRequest(t *testing.T) {
 
 	// test that default user-agent is attached to the request
 	userAgent := req.Header.Get("User-Agent")
-	if c.UserAgent != userAgent {
+	if c.UserAgent != flowdock.UserAgent {
 		t.Errorf("NewRequest() User-Agent = %v, want %v", userAgent, c.UserAgent)
 	}
 }
 
 func TestNewRequest_badURL(t *testing.T) {
-	c := NewClient(nil)
+	c := flowdock.NewClient(nil)
 	_, err := c.NewRequest("GET", ":", nil)
 	testURLParseError(t, err)
 }
@@ -212,13 +214,13 @@ func TestCheckResponse(t *testing.T) {
 		Body: ioutil.NopCloser(strings.NewReader(`{"message":"m", 
                         "errors": [{"resource": "r", "field": "f", "code": "c"}]}`)),
 	}
-	err := CheckResponse(res).(*ErrorResponse)
+	err := flowdock.CheckResponse(res).(*flowdock.ErrorResponse)
 
 	if err == nil {
 		t.Errorf("Expected error response.")
 	}
 
-	want := &ErrorResponse{
+	want := &flowdock.ErrorResponse{
 		Response: res,
 		Data: []byte(`{"message":"m", 
                         "errors": [{"resource": "r", "field": "f", "code": "c"}]}`),
@@ -236,13 +238,13 @@ func TestCheckResponse_noBody(t *testing.T) {
 		StatusCode: http.StatusBadRequest,
 		Body:       ioutil.NopCloser(strings.NewReader("")),
 	}
-	err := CheckResponse(res).(*ErrorResponse)
+	err := flowdock.CheckResponse(res).(*flowdock.ErrorResponse)
 
 	if err == nil {
 		t.Errorf("Expected error response.")
 	}
 
-	want := &ErrorResponse{
+	want := &flowdock.ErrorResponse{
 		Response: res,
 		Data:     []byte{},
 	}
@@ -253,7 +255,7 @@ func TestCheckResponse_noBody(t *testing.T) {
 
 func TestErrorResponse_Error(t *testing.T) {
 	res := &http.Response{Request: &http.Request{}}
-	err := ErrorResponse{Data: []byte("m"), Response: res}
+	err := flowdock.ErrorResponse{Data: []byte("m"), Response: res}
 	if err.Error() == "" {
 		t.Errorf("Expected non-empty ErrorResponse.Error()")
 	}

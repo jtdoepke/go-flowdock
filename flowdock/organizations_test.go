@@ -1,10 +1,12 @@
-package flowdock
+package flowdock_test
 
 import (
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 var (
@@ -26,7 +28,7 @@ func TestOrganizationsService_All(t *testing.T) {
 		t.Errorf("Organizations.All returned error: %v", err)
 	}
 
-	want := []Organization{{Id: &organizationId1}, {Id: &organizationId2}}
+	want := []flowdock.Organization{{Id: &organizationId1}, {Id: &organizationId2}}
 	if !reflect.DeepEqual(organizations, want) {
 		t.Errorf("Organizations.All returned %+v, want %+v", organizations, want)
 	}
@@ -48,7 +50,7 @@ func TestOrganizationsService_GetByParameterizedName(t *testing.T) {
 		t.Errorf("Organizations.GetByParameterizedName returned error: %v", err)
 	}
 
-	want := Organization{ParameterizedName: &name}
+	want := flowdock.Organization{ParameterizedName: &name}
 	if !reflect.DeepEqual(organization.ParameterizedName, want.ParameterizedName) {
 		t.Errorf("Organizations.GetByParameterizedName returned %+v, want %+v", organization.ParameterizedName, want.ParameterizedName)
 	}
@@ -68,7 +70,7 @@ func TestOrganizationsService_GetById(t *testing.T) {
 		t.Errorf("Organizations.GetById returned error: %v", err)
 	}
 
-	want := Organization{Id: &organizationId1}
+	want := flowdock.Organization{Id: &organizationId1}
 	if !reflect.DeepEqual(organization.Id, want.Id) {
 		t.Errorf("Organizations.GetById returned %+v, want %+v", organization.Id, want.Id)
 	}
@@ -85,7 +87,7 @@ func TestOrganizationsService_Update(t *testing.T) {
 		fmt.Fprint(w, `{"id":1, "name":"new-name"}`)
 	})
 
-	opts := &OrganizationUpdateOptions{
+	opts := &flowdock.OrganizationUpdateOptions{
 		Name: name,
 	}
 	organization, _, err := client.Organizations.Update(organizationId1, opts)
@@ -93,7 +95,7 @@ func TestOrganizationsService_Update(t *testing.T) {
 		t.Errorf("Organizations.Update returned error: %v", err)
 	}
 
-	want := Organization{Name: &name}
+	want := flowdock.Organization{Name: &name}
 	if !reflect.DeepEqual(organization.Name, want.Name) {
 		t.Errorf("Organizations.Update returned %+v, want %+v", organization.Name, want.Name)
 	}

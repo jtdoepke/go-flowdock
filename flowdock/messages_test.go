@@ -1,10 +1,12 @@
-package flowdock
+package flowdock_test
 
 import (
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
 func TestMessagesService_Stream(t *testing.T) {
@@ -91,7 +93,7 @@ func TestMessagesService_List(t *testing.T) {
 		t.Errorf("Messages.List returned error: %v", err)
 	}
 
-	want := []Message{
+	want := []flowdock.Message{
 		{
 			ID:    &idOne,
 			Event: &eventOne,
@@ -130,7 +132,7 @@ func TestMessagesService_Create_message(t *testing.T) {
 		}`)
 	})
 
-	opt := MessagesCreateOptions{
+	opt := flowdock.MessagesCreateOptions{
 		Event:   "message",
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
@@ -163,7 +165,7 @@ func TestMessagesService_Create_comment(t *testing.T) {
 		}`)
 	})
 
-	opt := MessagesCreateOptions{
+	opt := flowdock.MessagesCreateOptions{
 		Event:   "comment",
 		Content: "This is a comment",
 	}
@@ -178,7 +180,7 @@ func TestMessagesService_Create_comment(t *testing.T) {
 
 	title := "Title of parent"
 	text := "This is a comment"
-	content := CommentContent{Title: &title, Text: &text}
+	content := flowdock.CommentContent{Title: &title, Text: &text}
 	messageContent := message.Content()
 	if !reflect.DeepEqual(messageContent, &content) {
 		t.Errorf("Messages.Create returned %+v, want %+v", messageContent, &content)
@@ -188,7 +190,7 @@ func TestMessagesService_Create_comment(t *testing.T) {
 func TestCommentContent_String(t *testing.T) {
 	title := "Title of parent"
 	text := "This is a comment"
-	content := CommentContent{Title: &title, Text: &text}
+	content := flowdock.CommentContent{Title: &title, Text: &text}
 
 	want := "This is a comment"
 	if *content.Text != want {
