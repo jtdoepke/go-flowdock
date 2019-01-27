@@ -17,7 +17,7 @@ func main() {
 	// flowsUpdate("iora", "wm-test-api", client)
 
 	flowsGet("iora", "culinary-extra", client)
-	flowsGetById("iora:culinary-extra", client)
+	flowsGetByID("iora:culinary-extra", client)
 	flowsList(client)
 
 	message := messagesCreate(client)
@@ -53,8 +53,8 @@ func flowsGet(org, name string, client *flowdock.Client) {
 	displayFlowData(*flow)
 }
 
-func flowsGetById(id string, client *flowdock.Client) {
-	flow, _, err := client.Flows.GetById(id)
+func flowsGetByID(id string, client *flowdock.Client) {
+	flow, _, err := client.Flows.GetByID(id)
 
 	if err != nil {
 		log.Fatal("Get:", err)
@@ -77,7 +77,7 @@ func flowsList(client *flowdock.Client) {
 
 func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
-	fmt.Println("Flow:", *flow.Id, *flow.Name, *org.Name, *flow.Url)
+	fmt.Println("Flow:", *flow.ID, *flow.Name, *org.Name, *flow.Url)
 }
 
 func messageList(client *flowdock.Client) {

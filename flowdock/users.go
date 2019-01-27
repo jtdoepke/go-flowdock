@@ -99,7 +99,7 @@ func (s *UsersService) Update(id int, opt *UserUpdateOptions) (*User, *http.Resp
 }
 
 type User struct {
-	Id           *int    `json:"id,omitempty"`
+	ID           *int    `json:"id,omitempty"`
 	Nick         *string `json:"nick,omitempty"`
 	Name         *string `json:"name,omitempty"`
 	Email        *string `json:"email,omitempty"`

@@ -22,8 +22,8 @@ type MessagesService struct {
 type MessagesListOptions struct {
 	Event   string   `url:"event,omitempty"`
 	Limit   int      `url:"limit,omitempty"`
-	SinceId int      `url:"since_id,omitempty"`
-	UntilId int      `url:"until_id,omitempty"`
+	SinceID int      `url:"since_id,omitempty"`
+	UntilID int      `url:"until_id,omitempty"`
 	Tags    []string `url:"tags,comma,omitempty"`
 	TagMode string   `url:"tag_mode,omitempty"`
 	Search  string   `url:"search,omitempty"`

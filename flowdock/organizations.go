@@ -54,10 +54,10 @@ func (s *OrganizationsService) GetByParameterizedName(name string) (*Organizatio
 	return organization, resp, err
 }
 
-// GetById fetches an organization by it's id.
+// GetByID fetches an organization by it's id.
 //
 // Flowdock API docs: https://www.flowdock.com/api/organizations
-func (s *OrganizationsService) GetById(id int) (*Organization, *http.Response, error) {
+func (s *OrganizationsService) GetByID(id int) (*Organization, *http.Response, error) {
 	u := fmt.Sprintf("organizations/find?id=%v", id)
 
 	req, err := s.client.NewRequest("GET", url.QueryEscape(u), nil)
@@ -100,7 +100,7 @@ func (s *OrganizationsService) Update(id int, opt *OrganizationUpdateOptions) (*
 
 // Organization represents a Flowdock organization to which members belong
 type Organization struct {
-	Id                *int    `json:"id,omitempty"`
+	ID                *int    `json:"id,omitempty"`
 	Name              *string `json:"name,omitempty"`
 	ParameterizedName *string `json:"parameterized_name,omitempty"`
 	UserLimit         *int64  `json:"user_limit,omitempty"`

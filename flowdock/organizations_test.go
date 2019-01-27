@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	organizationId1 int = 1
-	organizationId2 int = 2
+	organizationID1 int = 1
+	organizationID2 int = 2
 )
 
 func TestOrganizationsService_All(t *testing.T) {
@@ -28,7 +28,7 @@ func TestOrganizationsService_All(t *testing.T) {
 		t.Errorf("Organizations.All returned error: %v", err)
 	}
 
-	want := []flowdock.Organization{{Id: &organizationId1}, {Id: &organizationId2}}
+	want := []flowdock.Organization{{ID: &organizationID1}, {ID: &organizationID2}}
 	if !reflect.DeepEqual(organizations, want) {
 		t.Errorf("Organizations.All returned %+v, want %+v", organizations, want)
 	}
@@ -56,7 +56,7 @@ func TestOrganizationsService_GetByParameterizedName(t *testing.T) {
 	}
 }
 
-func TestOrganizationsService_GetById(t *testing.T) {
+func TestOrganizationsService_GetByID(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -65,14 +65,14 @@ func TestOrganizationsService_GetById(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	organization, _, err := client.Organizations.GetById(organizationId1)
+	organization, _, err := client.Organizations.GetByID(organizationID1)
 	if err != nil {
-		t.Errorf("Organizations.GetById returned error: %v", err)
+		t.Errorf("Organizations.GetByID returned error: %v", err)
 	}
 
-	want := flowdock.Organization{Id: &organizationId1}
-	if !reflect.DeepEqual(organization.Id, want.Id) {
-		t.Errorf("Organizations.GetById returned %+v, want %+v", organization.Id, want.Id)
+	want := flowdock.Organization{ID: &organizationID1}
+	if !reflect.DeepEqual(organization.ID, want.ID) {
+		t.Errorf("Organizations.GetByID returned %+v, want %+v", organization.ID, want.ID)
 	}
 }
 
@@ -90,7 +90,7 @@ func TestOrganizationsService_Update(t *testing.T) {
 	opts := &flowdock.OrganizationUpdateOptions{
 		Name: name,
 	}
-	organization, _, err := client.Organizations.Update(organizationId1, opts)
+	organization, _, err := client.Organizations.Update(organizationID1, opts)
 	if err != nil {
 		t.Errorf("Organizations.Update returned error: %v", err)
 	}

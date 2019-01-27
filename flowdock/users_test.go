@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	userId1 int = 1
-	userId2 int = 2
+	userID1 int = 1
+	userID2 int = 2
 )
 
 func TestUsersService_All(t *testing.T) {
@@ -28,7 +28,7 @@ func TestUsersService_All(t *testing.T) {
 		t.Errorf("Users.All returned error: %v", err)
 	}
 
-	want := []flowdock.User{{Id: &userId1}, {Id: &userId2}}
+	want := []flowdock.User{{ID: &userID1}, {ID: &userID2}}
 	if !reflect.DeepEqual(users, want) {
 		t.Errorf("Users.All returned %+v, want %+v", users, want)
 	}
@@ -48,7 +48,7 @@ func TestUsersService_List(t *testing.T) {
 		t.Errorf("Users.List returned error: %v", err)
 	}
 
-	want := []flowdock.User{{Id: &userId1}, {Id: &userId2}}
+	want := []flowdock.User{{ID: &userID1}, {ID: &userID2}}
 	if !reflect.DeepEqual(users, want) {
 		t.Errorf("Users.List returned %+v, want %+v", users, want)
 	}
@@ -63,14 +63,14 @@ func TestUsersService_Get(t *testing.T) {
 		fmt.Fprint(w, `{"id":1}`)
 	})
 
-	user, _, err := client.Users.Get(userId1)
+	user, _, err := client.Users.Get(userID1)
 	if err != nil {
 		t.Errorf("Users.Get returned error: %v", err)
 	}
 
-	want := flowdock.User{Id: &userId1}
-	if !reflect.DeepEqual(user.Id, want.Id) {
-		t.Errorf("Users.Get returned %+v, want %+v", user.Id, want.Id)
+	want := flowdock.User{ID: &userID1}
+	if !reflect.DeepEqual(user.ID, want.ID) {
+		t.Errorf("Users.Get returned %+v, want %+v", user.ID, want.ID)
 	}
 }
 
@@ -88,7 +88,7 @@ func TestUsersService_Update(t *testing.T) {
 	opts := &flowdock.UserUpdateOptions{
 		Nick: "new-nick",
 	}
-	user, _, err := client.Users.Update(userId1, opts)
+	user, _, err := client.Users.Update(userID1, opts)
 	if err != nil {
 		t.Errorf("Users.Update returned error: %v", err)
 	}

@@ -15,7 +15,7 @@ type FlowsService struct {
 
 // Flow represents a Flowdock flow (room).
 type Flow struct {
-	Id                *string       `json:"id,omitempty"`
+	ID                *string       `json:"id,omitempty"`
 	Name              *string       `json:"name,omitempty"`
 	ParameterizedName *string       `json:"parameterized_name,omitempty"`
 	UnreadMentions    *int64        `json:"unread_mentions,omitempty"`
@@ -41,7 +41,7 @@ type FlowsListOptions struct {
 // FlowsGetOptions specifies the optional parameters to the FlowsService.Get
 // method.
 type FlowsGetOptions struct {
-	Id string `url:"id,omitempty"`
+	ID string `url:"id,omitempty"`
 }
 
 // FlowsCreateOptions specifies the optional parameters to the
@@ -106,9 +106,9 @@ func (s *FlowsService) Get(org, flowName string) (*Flow, *http.Response, error) 
 // list of flows.
 //
 // Flowdock API docs: https://www.flowdock.com/api/flows
-func (s *FlowsService) GetById(id string) (*Flow, *http.Response, error) {
+func (s *FlowsService) GetByID(id string) (*Flow, *http.Response, error) {
 	u := "flows/find"
-	u, err := addOptions(u, FlowsGetOptions{Id: id})
+	u, err := addOptions(u, FlowsGetOptions{ID: id})
 	if err != nil {
 		return nil, nil, err
 	}
