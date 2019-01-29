@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
@@ -49,9 +50,7 @@ func teardown() {
 }
 
 func testMethod(t *testing.T, r *http.Request, want string) {
-	if want != r.Method {
-		t.Errorf("Request method = %v, want %v", r.Method, want)
-	}
+	assert.Equal(t, want, r.Method, "Request method = %v, want %v", r.Method, want)
 }
 
 type responseWriter interface {
@@ -66,39 +65,23 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 	for k, v := range values {
 		want.Add(k, v)
 	}
-
 	err := r.ParseForm()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(want, r.Form) {
-		t.Errorf("Request parameters = %v, want %v", r.Form, want)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, want, r.Form, "Request parameters = %v, want %v", r.Form, want)
 }
 
 func TestNewClient(t *testing.T) {
 	c := flowdock.NewClient(nil)
-
-	if c.RestURL.String() != flowdock.RestURL {
-		t.Errorf("NewClient RestURL = %v, want %v", c.RestURL.String(), flowdock.RestURL)
-	}
-	if c.UserAgent != flowdock.UserAgent {
-		t.Errorf("NewClient UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
-	}
+	assert.Equal(t, flowdock.RestURL, c.RestURL.String(), "NewClient RestURL = %v, want %v", c.RestURL.String(), flowdock.RestURL)
+	assert.Equal(t, flowdock.UserAgent, c.UserAgent, "NewClient UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
 }
 
 func TestNewClientWithToken(t *testing.T) {
 	token := "not-real-token"
 	c := flowdock.NewClientWithToken(nil, token)
-
 	url := fmt.Sprintf(flowdock.TokenRestURL, token)
-	if c.RestURL.String() != url {
-		t.Errorf("NewClientWithToken RestURL = %v, want %v", c.RestURL.String(), url)
-	}
-	if c.UserAgent != flowdock.UserAgent {
-		t.Errorf("NewClientWithToken UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
-	}
+	assert.Equal(t, url, c.RestURL.String(), "NewClientWithToken RestURL = %v, want %v", c.RestURL.String(), url)
+	assert.Equal(t, flowdock.UserAgent, c.UserAgent, "NewClientWithToken UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
 }
 
 func TestNewRequest(t *testing.T) {
@@ -110,21 +93,15 @@ func TestNewRequest(t *testing.T) {
 	req, _ := c.NewRequest("GET", inURL, inBody)
 
 	// test that relative URL was expanded
-	if req.URL.String() != outURL {
-		t.Errorf("NewRequest(%v) URL = %v, want %v", inURL, req.URL, outURL)
-	}
+	assert.Equal(t, outURL, req.URL.String(), "NewRequest(%v) URL = %v, want %v", inURL, req.URL, outURL)
 
 	// test that body was JSON encoded
 	body, _ := ioutil.ReadAll(req.Body)
-	if string(body) != outBody {
-		t.Errorf("NewRequest(%v) Body = %v, want %v", inBody, string(body), outBody)
-	}
+	assert.Equal(t, outBody, string(body), "NewRequest(%v) Body = %v, want %v", inBody, string(body), outBody)
 
 	// test that default user-agent is attached to the request
 	userAgent := req.Header.Get("User-Agent")
-	if c.UserAgent != flowdock.UserAgent {
-		t.Errorf("NewRequest() User-Agent = %v, want %v", userAgent, c.UserAgent)
-	}
+	assert.Equal(t, flowdock.UserAgent, c.UserAgent, "NewRequest() User-Agent = %v, want %v", userAgent, c.UserAgent)
 }
 
 func TestNewRequest_badURL(t *testing.T) {
@@ -134,11 +111,9 @@ func TestNewRequest_badURL(t *testing.T) {
 }
 
 func testURLParseError(t *testing.T, err error) {
-	if err == nil {
-		t.Errorf("Expected error to be returned")
-	}
-	if err, ok := err.(*url.Error); !ok || err.Op != "parse" {
-		t.Errorf("Expected URL parse error, got %+v", err)
+	assert.Error(t, err, "Expected error to be returned")
+	if assert.IsType(t, new(url.Error), err, "Expected URL error, got %+v", err) {
+		assert.Equal(t, "parse", err.(*url.Error).Op, "Expected URL parse error, got %+v", err)
 	}
 }
 
@@ -151,23 +126,17 @@ func TestDo(t *testing.T) {
 	}
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if m := "GET"; m != r.Method {
-			t.Errorf("Request method = %v, want %v", r.Method, m)
-		}
+		assert.Equal(t, "GET", r.Method, "Request method = %v, want GET", r.Method)
 		fmt.Fprint(w, `{"A":"a"}`)
 	})
 
 	req, _ := client.NewRequest("GET", "/", nil)
 	body := new(foo)
 	_, err := client.Do(req, body)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	want := &foo{"a"}
-	if !reflect.DeepEqual(body, want) {
-		t.Errorf("Response body = %v, want %v", body, want)
-	}
+	assert.Equal(t, want, body, "Response body = %v, want %v", body, want)
 }
 
 func TestDo_httpError(t *testing.T) {
@@ -181,9 +150,7 @@ func TestDo_httpError(t *testing.T) {
 	req, _ := client.NewRequest("GET", "/", nil)
 	_, err := client.Do(req, nil)
 
-	if err == nil {
-		t.Error("Expected HTTP 400 error.")
-	}
+	assert.Error(t, err, "Expected HTTP 400 error.")
 }
 
 // Test handling of an error caused by the internal http client's Do()
@@ -199,12 +166,8 @@ func TestDo_redirectLoop(t *testing.T) {
 	req, _ := client.NewRequest("GET", "/", nil)
 	_, err := client.Do(req, nil)
 
-	if err == nil {
-		t.Error("Expected error to be returned.")
-	}
-	if err, ok := err.(*url.Error); !ok {
-		t.Errorf("Expected a URL error; got %#v.", err)
-	}
+	assert.Error(t, err, "Expected error to be returned.")
+	assert.IsType(t, new(url.Error), err, "Expected a URL error; got %#v.", err)
 }
 
 func TestCheckResponse(t *testing.T) {
@@ -212,22 +175,17 @@ func TestCheckResponse(t *testing.T) {
 		Request:    &http.Request{},
 		StatusCode: http.StatusBadRequest,
 		Body: ioutil.NopCloser(strings.NewReader(`{"message":"m", 
-                        "errors": [{"resource": "r", "field": "f", "code": "c"}]}`)),
+		"errors": [{"resource": "r", "field": "f", "code": "c"}]}`)),
 	}
 	err := flowdock.CheckResponse(res).(*flowdock.ErrorResponse)
-
-	if err == nil {
-		t.Errorf("Expected error response.")
-	}
+	assert.Error(t, err, "Expected error response.")
 
 	want := &flowdock.ErrorResponse{
 		Response: res,
 		Data: []byte(`{"message":"m", 
-                        "errors": [{"resource": "r", "field": "f", "code": "c"}]}`),
+		"errors": [{"resource": "r", "field": "f", "code": "c"}]}`),
 	}
-	if !reflect.DeepEqual(err, want) {
-		t.Errorf("Error = %#v, want %#v", err, want)
-	}
+	assert.Equal(t, want, err, "Error = %#v, want %#v", err, want)
 }
 
 // ensure that we properly handle API errors that do not contain a response
@@ -239,24 +197,17 @@ func TestCheckResponse_noBody(t *testing.T) {
 		Body:       ioutil.NopCloser(strings.NewReader("")),
 	}
 	err := flowdock.CheckResponse(res).(*flowdock.ErrorResponse)
-
-	if err == nil {
-		t.Errorf("Expected error response.")
-	}
+	assert.Error(t, err, "Expected error response.")
 
 	want := &flowdock.ErrorResponse{
 		Response: res,
 		Data:     []byte{},
 	}
-	if !reflect.DeepEqual(err, want) {
-		t.Errorf("Error = %#v, want %#v", err, want)
-	}
+	assert.Equal(t, want, err, "Error = %#v, want %#v", err, want)
 }
 
 func TestErrorResponse_Error(t *testing.T) {
 	res := &http.Response{Request: &http.Request{}}
-	err := flowdock.ErrorResponse{Data: []byte("m"), Response: res}
-	if err.Error() == "" {
-		t.Errorf("Expected non-empty ErrorResponse.Error()")
-	}
+	err := &flowdock.ErrorResponse{Data: []byte("m"), Response: res}
+	assert.NotEqual(t, "", err.Error(), "Expected non-empty ErrorResponse.Error()")
 }

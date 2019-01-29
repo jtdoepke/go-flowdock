@@ -3,8 +3,9 @@ package flowdock_test
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
@@ -26,12 +27,8 @@ func TestInboxService_Create(t *testing.T) {
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
 	message, _, err := client.Inbox.Create("xxx", &opt)
-	if err != nil {
-		t.Errorf("Messages.Create returned error: %v", err)
-	}
+	assert.NoError(t, err, "Messages.Create returned error: %v", err)
 
 	want := new(flowdock.Message)
-	if !reflect.DeepEqual(message, want) {
-		t.Errorf("Messages.Create returned \n%+v \nwant \n%+v", message, want)
-	}
+	assert.Equal(t, want, message, "Messages.Create returned \n%+v \nwant \n%+v", message, want)
 }

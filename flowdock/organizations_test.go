@@ -3,8 +3,9 @@ package flowdock_test
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
@@ -24,14 +25,10 @@ func TestOrganizationsService_All(t *testing.T) {
 	})
 
 	organizations, _, err := client.Organizations.All()
-	if err != nil {
-		t.Errorf("Organizations.All returned error: %v", err)
-	}
+	assert.NoError(t, err, "Organizations.All returned error: %v", err)
 
 	want := []flowdock.Organization{{ID: &organizationID1}, {ID: &organizationID2}}
-	if !reflect.DeepEqual(organizations, want) {
-		t.Errorf("Organizations.All returned %+v, want %+v", organizations, want)
-	}
+	assert.Equal(t, want, organizations, "Organizations.All returned %+v, want %+v", organizations, want)
 }
 
 func TestOrganizationsService_GetByParameterizedName(t *testing.T) {
@@ -46,14 +43,13 @@ func TestOrganizationsService_GetByParameterizedName(t *testing.T) {
 	})
 
 	organization, _, err := client.Organizations.GetByParameterizedName(name)
-	if err != nil {
-		t.Errorf("Organizations.GetByParameterizedName returned error: %v", err)
-	}
+	assert.NoError(t, err, "Organizations.GetByParameterizedName returned error: %v", err)
 
 	want := flowdock.Organization{ParameterizedName: &name}
-	if !reflect.DeepEqual(organization.ParameterizedName, want.ParameterizedName) {
-		t.Errorf("Organizations.GetByParameterizedName returned %+v, want %+v", organization.ParameterizedName, want.ParameterizedName)
-	}
+	assert.Equal(t,
+		want.ParameterizedName, organization.ParameterizedName,
+		"Organizations.GetByParameterizedName returned %+v, want %+v", organization.ParameterizedName, want.ParameterizedName,
+	)
 }
 
 func TestOrganizationsService_GetByID(t *testing.T) {
@@ -66,14 +62,10 @@ func TestOrganizationsService_GetByID(t *testing.T) {
 	})
 
 	organization, _, err := client.Organizations.GetByID(organizationID1)
-	if err != nil {
-		t.Errorf("Organizations.GetByID returned error: %v", err)
-	}
+	assert.NoError(t, err, "Organizations.GetByID returned error: %v", err)
 
 	want := flowdock.Organization{ID: &organizationID1}
-	if !reflect.DeepEqual(organization.ID, want.ID) {
-		t.Errorf("Organizations.GetByID returned %+v, want %+v", organization.ID, want.ID)
-	}
+	assert.Equal(t, want.ID, organization.ID, "Organizations.GetByID returned %+v, want %+v", organization.ID, want.ID)
 }
 
 func TestOrganizationsService_Update(t *testing.T) {
@@ -91,12 +83,8 @@ func TestOrganizationsService_Update(t *testing.T) {
 		Name: name,
 	}
 	organization, _, err := client.Organizations.Update(organizationID1, opts)
-	if err != nil {
-		t.Errorf("Organizations.Update returned error: %v", err)
-	}
+	assert.NoError(t, err, "Organizations.Update returned error: %v", err)
 
 	want := flowdock.Organization{Name: &name}
-	if !reflect.DeepEqual(organization.Name, want.Name) {
-		t.Errorf("Organizations.Update returned %+v, want %+v", organization.Name, want.Name)
-	}
+	assert.Equal(t, want.Name, organization.Name, "Organizations.Update returned %+v, want %+v", organization.Name, want.Name)
 }

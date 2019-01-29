@@ -3,8 +3,9 @@ package flowdock_test
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
@@ -37,15 +38,11 @@ func TestMessagesService_Stream(t *testing.T) {
 	stream, _, err := client.Messages.Stream("token", "org", "flow")
 	more <- true // tell test server to send a message
 
-	if err != nil {
-		t.Errorf("Messages.Stream returned error: %v", err)
-	}
+	assert.NoError(t, err, "Messages.Stream returned error: %v", err)
 
 	msg := <-stream
 
-	if msg.Content().String() != "message 0" {
-		t.Fatalf("expected message 0, got %v", msg.Content())
-	}
+	assert.Equal(t, "message 0", msg.Content().String(), "expected message 0, got %v", msg.Content())
 }
 
 func TestMessagesService_List(t *testing.T) {
@@ -89,9 +86,7 @@ func TestMessagesService_List(t *testing.T) {
 	})
 
 	messages, _, err := client.Messages.List("org", "flow", nil)
-	if err != nil {
-		t.Errorf("Messages.List returned error: %v", err)
-	}
+	assert.NoError(t, err, "Messages.List returned error: %v", err)
 
 	want := []flowdock.Message{
 		{
@@ -105,15 +100,9 @@ func TestMessagesService_List(t *testing.T) {
 	}
 
 	for i, msg := range messages {
-		if *msg.ID != *want[i].ID {
-			t.Errorf("Messages.List returned %+v, want %+v", *msg.ID, *want[i].ID)
-		}
-		if *msg.Event != *want[i].Event {
-			t.Errorf("Messages.List returned %+v, want %+v", *msg.Event, *want[i].Event)
-		}
-		if msg.Content().String() != content[i] {
-			t.Errorf("Messages.List returned %+v, want %+v", msg.Content(), content[i])
-		}
+		assert.Equal(t, *want[i].ID, *msg.ID, "Messages.List returned %+v, want %+v", *msg.ID, *want[i].ID)
+		assert.Equal(t, *want[i].Event, *msg.Event, "Messages.List returned %+v, want %+v", *msg.Event, *want[i].Event)
+		assert.Equal(t, content[i], msg.Content().String(), "Messages.List returned %+v, want %+v", msg.Content(), content[i])
 	}
 }
 
@@ -137,17 +126,9 @@ func TestMessagesService_Create_message(t *testing.T) {
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
 	message, _, err := client.Messages.Create(&opt)
-	if err != nil {
-		t.Errorf("Messages.Create returned error: %v", err)
-	}
-
-	if !reflect.DeepEqual(*message.Event, opt.Event) {
-		t.Errorf("Messages.Create returned %+v, want %+v", *message.Event, opt.Event)
-	}
-
-	if !reflect.DeepEqual(message.Content().String(), opt.Content) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.Content(), opt.Content)
-	}
+	assert.NoError(t, err, "Messages.Create returned error: %v", err)
+	assert.Equal(t, opt.Event, *message.Event, "Messages.Create returned %+v, want %+v", *message.Event, opt.Event)
+	assert.Equal(t, opt.Content, message.Content().String(), "Messages.Create returned %+v, want %+v", message.Content(), opt.Content)
 }
 
 func TestMessagesService_Create_comment(t *testing.T) {
@@ -170,21 +151,14 @@ func TestMessagesService_Create_comment(t *testing.T) {
 		Content: "This is a comment",
 	}
 	message, _, err := client.Messages.CreateComment(&opt)
-	if err != nil {
-		t.Errorf("Messages.CreateComment returned error: %v", err)
-	}
-
-	if !reflect.DeepEqual(message.Event, message.Event) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, message.Event)
-	}
+	assert.NoError(t, err, "Messages.CreateComment returned error: %v", err)
+	assert.Equal(t, opt.Event, *message.Event, "Messages.Create returned %+v, want %+v", *message.Event, opt.Event)
 
 	title := "Title of parent"
 	text := "This is a comment"
 	content := flowdock.CommentContent{Title: &title, Text: &text}
 	messageContent := message.Content()
-	if !reflect.DeepEqual(messageContent, &content) {
-		t.Errorf("Messages.Create returned %+v, want %+v", messageContent, &content)
-	}
+	assert.Equal(t, &content, messageContent, "Messages.Create returned %+v, want %+v", messageContent, &content)
 }
 
 func TestCommentContent_String(t *testing.T) {
@@ -193,7 +167,5 @@ func TestCommentContent_String(t *testing.T) {
 	content := flowdock.CommentContent{Title: &title, Text: &text}
 
 	want := "This is a comment"
-	if *content.Text != want {
-		t.Errorf("Messages.Create returned %+v, want %+v", *content.Text, want)
-	}
+	assert.Equal(t, want, *content.Text, "Messages.Create returned %+v, want %+v", *content.Text, want)
 }
