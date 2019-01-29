@@ -10,47 +10,46 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
-var (
-	// mux is the HTTP request multiplexer used with the test server.
-	mux *http.ServeMux
+type Suite struct {
+	suite.Suite
 
-	// client is the Flowdock client being tested.
-	client *flowdock.Client
+	mux          *http.ServeMux   // mux is the HTTP request multiplexer used with the test server.
+	server       *httptest.Server // server is a test HTTP server used to provide mock REST API responses.
+	streamServer *httptest.Server // streamServer is a test HTTP server used to provide mock stream API responses.
 
-	// server is a test HTTP server used to provide mock API responses.
-	server *httptest.Server
+	client *flowdock.Client // client is the Flowdock client being tested.
+}
 
-	// server is a test HTTP server used to provide mock API responses.
-	streamServer *httptest.Server
-)
-
-// setup sets up a test HTTP server along with a flowdock.Client that is
+// SetupTest sets up a test HTTP server along with a flowdock.Client that is
 // configured to talk to that test server. Tests should register handlers on mux
 // which provide mock responses for the API method being tested.
-func setup() {
+func (s *Suite) SetupTest() {
 	// test server
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
-	streamServer = httptest.NewServer(mux)
+	s.mux = http.NewServeMux()
+	s.server = httptest.NewServer(s.mux)
+	s.streamServer = httptest.NewServer(s.mux)
 
 	// flowdock client configured to use test server
-	client = flowdock.NewClient(nil)
-	client.RestURL, _ = url.Parse(server.URL)
-	client.StreamURL, _ = url.Parse(streamServer.URL)
+	s.client = flowdock.NewClient(nil)
+	s.client.RestURL, _ = url.Parse(s.server.URL)
+	s.client.StreamURL, _ = url.Parse(s.streamServer.URL)
 }
 
-// teardown closes the test HTTP server.
-func teardown() {
-	server.Close()
-	streamServer.Close()
+// TearDownTest closes the test HTTP server.
+func (s *Suite) TearDownTest() {
+	s.server.Close()
+	s.streamServer.Close()
 }
 
-func testMethod(t *testing.T, r *http.Request, want string) {
-	assert.Equal(t, want, r.Method, "Request method = %v, want %v", r.Method, want)
+// In order for 'go test' to run the test suite, we need to create
+// a normal test function and pass our suite to suite.Run
+func TestAPI(t *testing.T) {
+	suite.Run(t, new(Suite))
 }
 
 type responseWriter interface {
@@ -107,67 +106,54 @@ func TestNewRequest(t *testing.T) {
 func TestNewRequest_badURL(t *testing.T) {
 	c := flowdock.NewClient(nil)
 	_, err := c.NewRequest("GET", ":", nil)
-	testURLParseError(t, err)
-}
-
-func testURLParseError(t *testing.T, err error) {
 	assert.Error(t, err, "Expected error to be returned")
 	if assert.IsType(t, new(url.Error), err, "Expected URL error, got %+v", err) {
 		assert.Equal(t, "parse", err.(*url.Error).Op, "Expected URL parse error, got %+v", err)
 	}
 }
 
-func TestDo(t *testing.T) {
-	setup()
-	defer teardown()
-
+func (s *Suite) TestDo() {
 	type foo struct {
 		A string
 	}
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "GET", r.Method, "Request method = %v, want GET", r.Method)
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		s.Equal("GET", r.Method, "Request method = %v, want GET", r.Method)
 		fmt.Fprint(w, `{"A":"a"}`)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
+	req, _ := s.client.NewRequest("GET", "/", nil)
 	body := new(foo)
-	_, err := client.Do(req, body)
-	assert.NoError(t, err)
+	_, err := s.client.Do(req, body)
+	s.NoError(err)
 
 	want := &foo{"a"}
-	assert.Equal(t, want, body, "Response body = %v, want %v", body, want)
+	s.Equal(want, body, "Response body = %v, want %v", body, want)
 }
 
-func TestDo_httpError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func (s *Suite) TestDo_httpError() {
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", 400)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
-	_, err := client.Do(req, nil)
+	req, _ := s.client.NewRequest("GET", "/", nil)
+	_, err := s.client.Do(req, nil)
 
-	assert.Error(t, err, "Expected HTTP 400 error.")
+	s.Error(err, "Expected HTTP 400 error.")
 }
 
 // Test handling of an error caused by the internal http client's Do()
 // function.
-func TestDo_redirectLoop(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func (s *Suite) TestDo_redirectLoop() {
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
-	_, err := client.Do(req, nil)
+	req, _ := s.client.NewRequest("GET", "/", nil)
+	_, err := s.client.Do(req, nil)
 
-	assert.Error(t, err, "Expected error to be returned.")
-	assert.IsType(t, new(url.Error), err, "Expected a URL error; got %#v.", err)
+	s.Error(err, "Expected error to be returned.")
+	s.IsType(new(url.Error), err, "Expected a URL error; got %#v.", err)
 }
 
 func TestCheckResponse(t *testing.T) {

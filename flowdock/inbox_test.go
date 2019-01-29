@@ -3,20 +3,14 @@ package flowdock_test
 import (
 	"fmt"
 	"net/http"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/jtdoepke/go-flowdock/flowdock"
 )
 
-func TestInboxService_Create(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/v1/messages/team_inbox/xxx", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "POST")
-		testFormValues(t, r, values{"subject": "a subject",
+func (s *Suite) TestInboxService_Create() {
+	s.mux.HandleFunc("/v1/messages/team_inbox/xxx", func(w http.ResponseWriter, r *http.Request) {
+		s.Equal("POST", r.Method, "Request method = %v, want %v", r.Method, "POST")
+		testFormValues(s.T(), r, values{"subject": "a subject",
 			"content": "Howdy-Doo @Jackie #awesome",
 		})
 		fmt.Fprint(w, `{}`)
@@ -26,9 +20,9 @@ func TestInboxService_Create(t *testing.T) {
 		Subject: "a subject",
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
-	message, _, err := client.Inbox.Create("xxx", &opt)
-	assert.NoError(t, err, "Messages.Create returned error: %v", err)
+	message, _, err := s.client.Inbox.Create("xxx", &opt)
+	s.NoError(err, "Messages.Create returned error: %v", err)
 
 	want := new(flowdock.Message)
-	assert.Equal(t, want, message, "Messages.Create returned \n%+v \nwant \n%+v", message, want)
+	s.Equal(want, message, "Messages.Create returned \n%+v \nwant \n%+v", message, want)
 }
