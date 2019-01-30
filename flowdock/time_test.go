@@ -8,6 +8,8 @@ import (
 )
 
 func TestTime_UnmarshalJSON(t *testing.T) {
+	t.Parallel()
+
 	flowdockTime := Time{}
 	json := []byte("1385546251160")
 	err := flowdockTime.UnmarshalJSON(json)

@@ -151,6 +151,8 @@ func (s *Suite) TestMessagesService_Create_comment() {
 }
 
 func TestCommentContent_String(t *testing.T) {
+	t.Parallel()
+
 	title := "Title of parent"
 	text := "This is a comment"
 	content := flowdock.CommentContent{Title: &title, Text: &text}

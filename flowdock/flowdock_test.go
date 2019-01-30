@@ -70,12 +70,16 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 }
 
 func TestNewClient(t *testing.T) {
+	t.Parallel()
+
 	c := flowdock.NewClient(nil)
 	assert.Equal(t, flowdock.RestURL, c.RestURL.String(), "NewClient RestURL = %v, want %v", c.RestURL.String(), flowdock.RestURL)
 	assert.Equal(t, flowdock.UserAgent, c.UserAgent, "NewClient UserAgent = %v, want %v", c.UserAgent, flowdock.UserAgent)
 }
 
 func TestNewClientWithToken(t *testing.T) {
+	t.Parallel()
+
 	token := "not-real-token"
 	c := flowdock.NewClientWithToken(nil, token)
 	url := fmt.Sprintf(flowdock.TokenRestURL, token)
@@ -84,6 +88,8 @@ func TestNewClientWithToken(t *testing.T) {
 }
 
 func TestNewRequest(t *testing.T) {
+	t.Parallel()
+
 	c := flowdock.NewClient(nil)
 
 	name := "n"
@@ -104,6 +110,8 @@ func TestNewRequest(t *testing.T) {
 }
 
 func TestNewRequest_badURL(t *testing.T) {
+	t.Parallel()
+
 	c := flowdock.NewClient(nil)
 	_, err := c.NewRequest("GET", ":", nil)
 	assert.Error(t, err, "Expected error to be returned")
@@ -157,6 +165,8 @@ func (s *Suite) TestDo_redirectLoop() {
 }
 
 func TestCheckResponse(t *testing.T) {
+	t.Parallel()
+
 	res := &http.Response{
 		Request:    &http.Request{},
 		StatusCode: http.StatusBadRequest,
@@ -177,6 +187,8 @@ func TestCheckResponse(t *testing.T) {
 // ensure that we properly handle API errors that do not contain a response
 // body
 func TestCheckResponse_noBody(t *testing.T) {
+	t.Parallel()
+
 	res := &http.Response{
 		Request:    &http.Request{},
 		StatusCode: http.StatusBadRequest,
@@ -193,6 +205,8 @@ func TestCheckResponse_noBody(t *testing.T) {
 }
 
 func TestErrorResponse_Error(t *testing.T) {
+	t.Parallel()
+
 	res := &http.Response{Request: &http.Request{}}
 	err := &flowdock.ErrorResponse{Data: []byte("m"), Response: res}
 	assert.NotEqual(t, "", err.Error(), "Expected non-empty ErrorResponse.Error()")
